@@ -1,0 +1,43 @@
+</div>
+
+<footer class="bg-white border-t border-gray-200 mt-8">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <p class="text-center text-gray-500 text-sm">&copy; <span th:text="${#temporals.year(#temporals.createNow())}">2023</span> Sistema de Inventario</p>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"></script>
+<script>
+    document.querySelector('[aria-controls="mobile-menu"]').addEventListener('click', function() {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+
+    $(document).ready(function() {
+        const successMessage = document.getElementById('success-message');
+        if (successMessage) {
+            iziToast.success({
+                title: 'Éxito',
+                message: successMessage.textContent,
+                position: 'topRight',
+                timeout: 5000,
+                transitionIn: 'fadeInDown'
+            });
+        }
+
+        const errorMessage = document.getElementById('error-message');
+        if (errorMessage) {
+            iziToast.error({
+                title: 'Error',
+                message: errorMessage.textContent,
+                position: 'topRight',
+                timeout: 5000,
+                transitionIn: 'fadeInDown'
+            });
+        }
+    });
+</script>
+<div th:replace="${template} ?: ~{::none}"></div>
+</body>
+</html>

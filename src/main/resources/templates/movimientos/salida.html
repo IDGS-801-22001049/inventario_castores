@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="compartidos/plantilla :: plantilla(~{::title}, ~{::section})">
+<head>
+    <title>Registrar Salida</title>
+</head>
+<body>
+    <section>
+        <div class="bg-white shadow rounded-lg overflow-hidden max-w-4xl mx-auto">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Registrar Salida de Producto</h2>
+            </div>
+            
+            <div class="p-6">
+                <form id="formularioMovimiento" th:action="@{/movimientos/salida}" th:object="${movimiento}" method="post" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="producto" class="block text-sm font-medium text-gray-700 mb-1">Producto</label>
+                            <select id="producto" th:field="*{producto}" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required
+                                    onchange="actualizarStockDisponible(this.value)">
+                                <option value="">Seleccione un producto</option>
+                                <option th:each="producto : ${productos}" 
+                                        th:value="${producto.id}"
+                                        th:text="${producto.nombre + ' (Disponibles: ' + producto.cantidad + ')'}"
+                                        th:data-stock="${producto.cantidad}"></option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="cantidad" class="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
+                            <input type="number" id="cantidad" th:field="*{cantidad}" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                            <p class="mt-1 text-sm text-gray-500">Stock disponible: <span id="stockDisponible" class="font-medium">0</span></p>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label for="observaciones" class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                            <textarea id="observaciones" th:field="*{observaciones}" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                        <a th:href="@{/movimientos/historial}" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-save mr-2"></i> Registrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            function actualizarStockDisponible(productoId) {
+                if (!productoId) {
+                    document.getElementById('stockDisponible').textContent = '0';
+                    return;
+                }
+                
+                const selectedOption = document.querySelector(`#producto option[value="${productoId}"]`);
+                if (selectedOption) {
+                    const stock = selectedOption.getAttribute('data-stock');
+                    document.getElementById('stockDisponible').textContent = stock;
+                    document.getElementById('cantidad').max = stock;
+                }
+            }
+
+            document.getElementById('formularioMovimiento').addEventListener('submit', function(event) {
+                const cantidad = parseInt(document.getElementById('cantidad').value);
+                const stockDisponible = parseInt(document.getElementById('stockDisponible').textContent);
+                
+                if (cantidad > stockDisponible) {
+                    event.preventDefault();
+                    alert('La cantidad no puede ser mayor al stock disponible');
+                }
+            });
+
+            const productoInicial = document.getElementById('producto').value;
+            if (productoInicial) {
+                actualizarStockDisponible(productoInicial);
+            }
+        </script>
+    </section>
+</body>
+</html>

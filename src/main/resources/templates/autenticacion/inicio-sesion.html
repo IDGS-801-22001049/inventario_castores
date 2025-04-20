@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Sistema de Inventario</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izitoast/dist/css/iziToast.min.css">
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gray-100">
+    <div class="w-full max-w-md mx-4">
+        <div class="bg-white p-8 rounded-lg shadow-lg animate__animated animate__fadeIn">
+            <div class="text-center mb-8">
+                <img src="/img/logo.png" alt="Logo" class="h-16 mx-auto mb-4">
+                <h1 class="text-3xl font-bold text-gray-800">Sistema de Inventario</h1>
+                <p class="text-gray-600">Ingresa tus credenciales para continuar</p>
+            </div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-gray-700">Usuario</label>
+                    <input type="text" id="username" name="username" required
+                           class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
+                </div>
+
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                    <input type="password" id="password" name="password" required
+                           class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
+                </div>
+
+                <div>
+                    <button type="submit" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                        Iniciar Sesión
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    ¿Problemas para ingresar? 
+                    <a href="#" class="font-medium text-purple-600 hover:text-purple-500">Contacta al administrador</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
+    
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            /*[[${param.error}]]*/
+            if (/*[[${param.error != null}]]*/ false) {
+                iziToast.error({
+                    title: 'Error',
+                    message: 'Usuario o contraseña incorrectos',
+                    position: 'topRight',
+                    timeout: 5000,
+                    animateInside: true,
+                    drag: true,
+                    progressBar: true,
+                    closeOnClick: true,
+                    displayMode: 2
+                });
+            }
+            
+            /*[[${param.logout}]]*/
+            if (/*[[${param.logout != null}]]*/ false) {
+                iziToast.success({
+                    title: 'Éxito',
+                    message: 'Has cerrado sesión correctamente',
+                    position: 'topRight',
+                    timeout: 5000,
+                    animateInside: true,
+                    drag: true,
+                    progressBar: true,
+                    closeOnClick: true,
+                    displayMode: 2
+                });
+            }
+        });
+    </script>
+</body>
+</html>

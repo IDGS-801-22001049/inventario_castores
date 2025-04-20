@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{compartidos/plantilla :: plantilla(~{::title}, ~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Movimientos</title>
+</head>
+<section>
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-gray-800">Historial de Movimientos</h2>
+            <a th:if="${#authorization.expression('hasRole(''ROLE_INVENTARIO'')')}" 
+               th:href="@{/movimientos/salida}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                <i class="fas fa-plus mr-2"></i> Registrar Salida
+            </a>
+        </div>
+
+        <div class="p-6">
+            <div class="overflow-x-auto">
+                <table id="dataTable" class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observaciones</th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="movimiento : ${movimientos}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${movimiento.id}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${movimiento.producto.nombre}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${movimiento.cantidad}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(movimiento.fecha, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold"
+                                  th:classappend="${movimiento.tipo == 'ENTRADA' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                [[${movimiento.tipo}]]
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500" th:text="${movimiento.observaciones}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

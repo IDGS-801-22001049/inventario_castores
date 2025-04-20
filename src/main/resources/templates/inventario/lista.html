@@ -1,0 +1,152 @@
+<!DOCTYPE html> 
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{compartidos/plantilla :: plantilla(~{::title}, ~{::section})}">
+<head>
+    <title>Lista de Productos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<section>
+    <div class="container mx-auto mt-10">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-gray-800">Lista de Productos</h2>
+            <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" 
+               th:href="@{/inventario/agregar}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                <i class="fas fa-plus mr-2"></i> Agregar Producto
+            </a>
+        </div>
+
+        <div class="p-6">
+            <div class="mb-4">
+                <select id="filtroEstado" class="w-full md:w-1/3 px-3 py-2 border border-gray-300 rounded-md shadow-sm" onchange="filtrarPorEstado()">
+                    <option value="">Todos los estados</option>
+                    <option value="DISPONIBLE">Disponible</option>
+                    <option value="AGOTADO">Agotado</option>
+                    <option value="DESCONTINUADO">Descontinuado</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-300 text-center">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-6 py-4">ID</th>
+                        <th class="px-6 py-4">Nombre</th>
+                        <th class="px-6 py-4">Precio</th>
+                        <th class="px-6 py-4">Cantidad</th>
+                        <th class="px-6 py-4">Estado</th>
+                        <th th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'') or hasRole(''ROLE_INVENTARIO'')')}" class="px-6 py-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="producto : ${productos}" class="hover:bg-gray-50">
+                        <td class="px-6 py-4" th:text="${producto.id}"></td>
+                        <td class="px-6 py-4" th:text="${producto.nombre}"></td>
+                        <td class="px-6 py-4">
+                            <span th:text="${#numbers.formatDecimal(producto.precio, 2, 0)}"></span> MXN
+                        </td>
+                        <td class="px-6 py-4" th:text="${producto.cantidad}"></td>
+                        <td class="px-6 py-4">
+                            <span th:if="${producto.estado == 'DISPONIBLE'}" class="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                Disponible
+                            </span>
+                            <span th:if="${producto.estado == 'AGOTADO'}" class="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                Agotado
+                            </span>
+                            <span th:if="${producto.estado == 'DESCONTINUADO'}" class="px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                                Descontinuado
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 space-x-2">
+                            <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" 
+                               th:href="@{/inventario/editar/{id}(id=${producto.id})}" 
+                               class="text-blue-500 hover:text-blue-700" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" 
+                               th:href="@{/inventario/eliminar/{id}(id=${producto.id})}" 
+                               class="text-red-500 hover:text-red-700" title="Eliminar">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                            
+                            <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'') or hasRole(''ROLE_INVENTARIO'')')}" class="inline-flex items-center space-x-1">
+
+                                <select name="cantidad" class="cantidad-selector border rounded p-1 text-xs w-20">
+                                    <option value="1">+1</option>
+                                    <option value="5">+5</option>
+                                    <option value="10">+10</option>
+                                </select>
+                            
+                                <a href="#"
+                                   th:data-id="${producto.id}"
+                                   class="text-green-600 hover:text-green-800 cursor-pointer"
+                                   title="Aumentar inventario"
+                                   onclick="aumentarInventario(this)">
+                                    <i class="fas fa-plus-circle"></i>
+                                </a>
+                            
+                            </div>
+                            
+                            
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function filtrarPorEstado() {
+            const estado = document.getElementById('filtroEstado').value;
+            const url = estado ? '/inventario/lista?estado=' + estado : '/inventario/lista';
+            window.location.href = url;
+        }
+
+        function aumentarInventario(elemento) {
+            const id = elemento.getAttribute('data-id');
+            const select = elemento.closest('div').querySelector('.cantidad-selector');
+            
+            if (!select) {
+                iziToast.error({
+                    title: 'Error',
+                    message: 'No se encontró el selector de cantidad',
+                    position: 'topRight'
+                });
+                return;
+            }
+
+            const cantidad = select.value;
+
+            fetch(`/inventario/aumentar/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ cantidad: cantidad })
+            })
+            .then(response => {
+                if (response.ok) {
+                    iziToast.success({
+                        title: 'Éxito',
+                        message: 'Inventario aumentado correctamente',
+                        position: 'topRight'
+                    });
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    return response.text().then(msg => {
+                        throw new Error(msg || 'Error desconocido');
+                    });
+                }
+            })
+            .catch(error => {
+                iziToast.error({
+                    title: 'Error',
+                    message: error.message || 'Error al aumentar inventario',
+                    position: 'topRight'
+                });
+            });
+        }
+    </script>
+</section>

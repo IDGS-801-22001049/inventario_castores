@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{compartidos/plantilla :: plantilla(~{::title}, ~{::section})}">
+<head>
+    <title th:text="${usuario.id != null} ? 'Editar Usuario' : 'Nuevo Usuario'"></title>
+</head>
+
+<section>
+    <div class="bg-white shadow rounded-lg overflow-hidden max-w-4xl mx-auto">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800" 
+                th:text="${usuario.id != null} ? 'Editar Usuario' : 'Nuevo Usuario'"></h2>
+        </div>
+        
+        <div class="p-6">
+            <form th:action="${usuario.id != null} ? 
+                             @{/admin/usuarios/guardar/{id}(id=${usuario.id})} : 
+                             @{/admin/usuarios/guardar}"
+                  th:object="${usuario}"
+                  method="post"
+                  class="space-y-6">
+                  
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Nombre de usuario</label>
+                        <input type="text" id="username" th:field="*{username}" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                        <input type="password" id="password" th:field="*{password}" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                               th:required="${usuario.id == null}">
+                        <p class="mt-1 text-sm text-gray-500" th:if="${usuario.id != null}">Dejar en blanco para mantener la contraseña actual</p>
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Roles</label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div th:each="rol : ${roles}" class="flex items-center">
+                                <input type="checkbox" th:id="${'rol-' + rol.id}" 
+                                       th:value="${rol.id}" 
+                                       th:checked="${usuario.roles.?[id == rol.id].size() > 0}"
+                                       name="rolesIds" 
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label th:for="${'rol-' + rol.id}" class="ml-2 block text-sm text-gray-900">
+                                    [[${rol.nombre}]]
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <a th:href="@{/admin/usuarios}" class="px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">Cancelar</a>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium">
+                        <i class="fas fa-save mr-2"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<body class="bg-gray-100" th:fragment="plantilla(title, section)">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title th:text="${titulo}">Sistema de Inventario</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izitoast/dist/css/iziToast.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    </head>
+
+    <nav class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-xl font-bold text-gray-800">Sistema de Inventario</a>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                    <a th:href="@{/productos}" class="border-blue-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Inventario</a>
+                    <a th:href="@{/movimientos/historial}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Movimientos</a>
+                    <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" 
+                       th:href="@{/admin/usuarios}" 
+                       class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Usuarios</a>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <span class="text-gray-500 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-user-circle mr-1"></i>
+                        <span sec:authentication="name"></span>
+                    </span>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-sign-out-alt mr-1"></i> Cerrar sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="p-6">
+        <div th:replace="${section}">Contenido por defecto</div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const links = document.querySelectorAll("nav a");
+          const currentPath = window.location.pathname;
+      
+          let bestMatch = null;
+          let bestMatchLength = -1;
+      
+          links.forEach(link => {
+            const href = link.getAttribute("href");
+            if (currentPath.startsWith(href) && href.length > bestMatchLength) {
+              bestMatch = link;
+              bestMatchLength = href.length;
+            }
+          });
+      
+          links.forEach(link => {
+            link.classList.remove("border-blue-500", "text-gray-900");
+            link.classList.add("border-transparent", "text-gray-500", "hover:border-gray-300", "hover:text-gray-700");
+          });
+      
+          if (bestMatch) {
+            bestMatch.classList.remove("border-transparent", "text-gray-500", "hover:border-gray-300", "hover:text-gray-700");
+            bestMatch.classList.add("border-blue-500", "text-gray-900");
+          }
+        });
+    </script>
+</body>
+</html>
