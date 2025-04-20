@@ -99,9 +99,17 @@
 
     <script>
         function filtrarPorEstado() {
-            const estado = document.getElementById('filtroEstado').value;
-            const url = estado ? '/inventario/lista?estado=' + estado : '/inventario/lista';
-            window.location.href = url;
+            const estado = document.getElementById('filtroEstado').value.toLowerCase();
+            const filas = document.querySelectorAll('tbody tr');
+            
+            filas.forEach(fila => {
+                const estadoFila = fila.querySelector('td:nth-child(5) span').textContent.trim().toLowerCase();
+                if (!estado || estadoFila.includes(estado)) {
+                    fila.style.display = '';
+                } else {
+                    fila.style.display = 'none';
+                }
+            });
         }
 
         function aumentarInventario(elemento) {

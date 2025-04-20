@@ -2,12 +2,13 @@ package com.castores.controladores;
 
 import com.castores.modelos.Usuario;
 import com.castores.servicios.ServicioUsuario;
-import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin/usuarios")
@@ -28,31 +29,60 @@ public class UsuarioController {
 
     @GetMapping("/nuevo")
     public String mostrarFormularioRegistro(Model model) {
-        model.addAttribute("usuario", new Usuario());
+        Usuario usuario = new Usuario();
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("username", usuario.getUsername()); // Asegura que el atributo exista
+        model.addAttribute("password", ""); // Asegura que el atributo exista
         model.addAttribute("roles", servicioUsuario.obtenerTodosRoles());
         return "admin/usuarios/formulario";
-    }
-
-    @PostMapping("/guardar")
-    public String guardarUsuario(@ModelAttribute Usuario usuario,
-            @RequestParam(required = false) List<Long> rolesIds,
-            RedirectAttributes redirectAttributes) {
-        servicioUsuario.guardarUsuario(usuario, rolesIds);
-        redirectAttributes.addFlashAttribute("mensaje", "Usuario guardado exitosamente");
-        return "redirect:/admin/usuarios";
     }
 
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEdicion(@PathVariable Long id, Model model) {
-        model.addAttribute("usuario", servicioUsuario.obtenerUsuarioPorId(id));
+        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(id);
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("username", usuario.getUsername()); // Asegura que el atributo exista
+        model.addAttribute("password", ""); // Asegura que el atributo exista
         model.addAttribute("roles", servicioUsuario.obtenerTodosRoles());
         return "admin/usuarios/formulario";
     }
 
-    @PostMapping("/eliminar/{id}")
+    @PostMapping(value = {"/guardar", "/guardar/{id}"})
+    public String guardarUsuario(@PathVariable(required = false) Long id,
+            @ModelAttribute("usuario") Usuario usuario,
+            @RequestParam("rolesIds") List<Long> rolesIds, RedirectAttributes redirectAttributes) {
+
+        if (id != null) {
+            usuario.setId(id);
+        }
+
+        try {
+            servicioUsuario.guardarUsuario(usuario, rolesIds);
+            redirectAttributes.addFlashAttribute("mensaje", "Usuario guardado exitosamente");
+            redirectAttributes.addFlashAttribute("tipoMensaje", "success");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensaje",
+                    "Error al guardar usuario: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("tipoMensaje", "error");
+
+            return (id != null) ? "redirect:/admin/usuarios/editar/" + id
+                    : "redirect:/admin/usuarios/nuevo";
+        }
+
+        return "redirect:/admin/usuarios";
+    }
+
+    @GetMapping("/eliminar/{id}")
     public String eliminarUsuario(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        servicioUsuario.eliminarUsuario(id);
-        redirectAttributes.addFlashAttribute("mensaje", "Usuario eliminado exitosamente");
+        try {
+            servicioUsuario.eliminarUsuario(id);
+            redirectAttributes.addFlashAttribute("mensaje", "Usuario eliminado exitosamente");
+            redirectAttributes.addFlashAttribute("tipoMensaje", "success");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensaje",
+                    "Error al eliminar usuario: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("tipoMensaje", "error");
+        }
         return "redirect:/admin/usuarios";
     }
 }

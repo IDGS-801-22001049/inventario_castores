@@ -62,7 +62,7 @@ public class InventarioController {
     }
 
     @PostMapping("/aumentar/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole(''ROLE_INVENTARIO'')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_INVENTARIO')")
     @ResponseBody
     public ResponseEntity<?> aumentarInventario(@PathVariable("id") Long id,
             @RequestParam("cantidad") int cantidad) {

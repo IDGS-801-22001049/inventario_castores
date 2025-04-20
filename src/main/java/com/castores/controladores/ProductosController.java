@@ -2,7 +2,6 @@ package com.castores.controladores;
 
 import com.castores.modelos.Producto;
 import com.castores.servicios.ServicioProducto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +17,6 @@ public class ProductosController {
     private final ServicioProducto servicioProducto;
     private static final String REDIRECT_PRODUCTOS = "redirect:/productos";
 
-    @Autowired
     public ProductosController(ServicioProducto servicioProducto) {
         this.servicioProducto = servicioProducto;
     }

@@ -3,7 +3,6 @@ package com.castores.servicios;
 import com.castores.modelos.Producto;
 import com.castores.repositorios.ProductoRepositorio;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +13,6 @@ public class ServicioProducto {
 
     private final ProductoRepositorio productoRepositorio;
 
-    @Autowired
     public ServicioProducto(ProductoRepositorio productoRepositorio) {
         this.productoRepositorio = productoRepositorio;
     }
